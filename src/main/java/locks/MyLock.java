@@ -2,7 +2,7 @@ package locks;
 
 public interface MyLock {
 
-    void lock();
+    void lock() throws InterruptedException;
 
     void unlock();
 }
