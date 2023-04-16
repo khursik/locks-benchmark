@@ -1,7 +1,7 @@
 package locks;
 
-import javax.xml.namespace.QName;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class CLHLock implements MyLock{
@@ -9,6 +9,8 @@ public class CLHLock implements MyLock{
     public class QNode {
         AtomicBoolean state = new AtomicBoolean(false);
     }
+
+    AtomicInteger counter = new AtomicInteger(0);
 
     AtomicReference<QNode> tail = new AtomicReference<QNode>(new QNode());
     ThreadLocal<QNode> myNode = new ThreadLocal<QNode>();
@@ -19,7 +21,8 @@ public class CLHLock implements MyLock{
         myNode.get().state.getAndSet(true);
         QNode pred = tail.getAndSet(myNode.get());
         myPred.set(pred);
-        while (!pred.state.get()) {}
+        while (pred.state.get()) {}
+        counter.getAndIncrement();
     }
 
     @Override
@@ -27,4 +30,11 @@ public class CLHLock implements MyLock{
         myNode.get().state.set(false);
         myNode.set(myPred.get());
     }
+
+    @Override
+    public int getCounter() {
+        return counter.get();
+    }
+
+
 }
