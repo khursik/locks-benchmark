@@ -36,4 +36,9 @@ public class MCSLock implements MyLock {
         }
         qNode.get().next.state = false;
     }
+
+    @Override
+    public int getCounter() {
+        return counter.get();
+    }
 }

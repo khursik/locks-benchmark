@@ -34,4 +34,9 @@ public class ExponentialBackoff implements MyLock {
     public void unlock() {
         state.set(false);
     }
+
+    @Override
+    public int getCounter() {
+        return counter.get();
+    }
 }

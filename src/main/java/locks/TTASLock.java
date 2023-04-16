@@ -24,4 +24,9 @@ public class TTASLock implements MyLock {
     public void unlock() {
         state.set(false);
     }
+
+    @Override
+    public int getCounter() {
+        return counter.get();
+    }
 }

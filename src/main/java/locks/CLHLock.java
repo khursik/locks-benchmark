@@ -30,4 +30,11 @@ public class CLHLock implements MyLock{
         myNode.get().state.set(false);
         myNode.set(myPred.get());
     }
+
+    @Override
+    public int getCounter() {
+        return counter.get();
+    }
+
+
 }
