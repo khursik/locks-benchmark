@@ -17,3 +17,4 @@ Usage: benchmark [options]
                            global timeout milliseconds
 
 ```
+
