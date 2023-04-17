@@ -1,19 +1,17 @@
 import locks.*;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.Callable;
 
-public class Benchmark implements Runnable {
+public class Benchmark implements Callable<Integer> {
 
     private final MyLock lock;
-    private final AtomicInteger counter = new AtomicInteger(0);
 
     public Benchmark(LockType lockType) {
         this.lock = getLockImp(lockType);
-
     }
 
     @Override
-    public void run() {
+    public Integer call() {
         try {
             lock.lock();
 
@@ -22,6 +20,7 @@ public class Benchmark implements Runnable {
         } finally {
             lock.unlock();
         }
+        return lock.getCounter();
     }
 
     private MyLock getLockImp(LockType lockType) {
@@ -32,6 +31,10 @@ public class Benchmark implements Runnable {
                 return new TTASLock();
             case BACKOFF:
                 return new ExponentialBackoff();
+            case CLH:
+                return new CLHLock();
+            case MCS:
+                return new MCSLock();
             default:
                 throw new IllegalArgumentException("Expected valid lock type value.");
         }

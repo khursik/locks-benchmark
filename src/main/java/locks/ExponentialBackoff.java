@@ -8,8 +8,9 @@ import static java.lang.Thread.sleep;
 
 public class ExponentialBackoff implements MyLock {
 
-    private final long MIN_DELAY = 100;
-    private final long MAX_DELAY = 3000;
+    private final static long MIN_DELAY = 100;
+    private final static long MAX_DELAY = 3000;
+
     AtomicBoolean state = new AtomicBoolean(false);
     AtomicInteger counter = new AtomicInteger(0);
 

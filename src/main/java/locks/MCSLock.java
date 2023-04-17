@@ -5,18 +5,18 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class MCSLock implements MyLock {
 
-    public class QNode {
+    public static class QNode {
         volatile boolean state = false;
         volatile QNode next = null;
     }
 
     AtomicInteger counter = new AtomicInteger(0);
 
-    AtomicReference<QNode> tail = new AtomicReference<QNode>(new QNode());
+    AtomicReference<QNode> tail = new AtomicReference<>(new QNode());
     ThreadLocal<QNode> qNode = new ThreadLocal<>();
 
     @Override
-    public void lock() throws InterruptedException {
+    public void lock() {
         QNode qPred = tail.getAndSet(qNode.get());
         if (qPred != null) {
             qNode.get().state = true;

@@ -6,18 +6,18 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class CLHLock implements MyLock{
 
-    public class QNode {
+    public static class QNode {
         AtomicBoolean state = new AtomicBoolean(false);
     }
 
     AtomicInteger counter = new AtomicInteger(0);
 
-    AtomicReference<QNode> tail = new AtomicReference<QNode>(new QNode());
-    ThreadLocal<QNode> myNode = new ThreadLocal<QNode>();
-    ThreadLocal<QNode> myPred = new ThreadLocal<QNode>();
+    AtomicReference<QNode> tail = new AtomicReference<>(new QNode());
+    ThreadLocal<QNode> myNode = new ThreadLocal<>();
+    ThreadLocal<QNode> myPred = new ThreadLocal<>();
 
     @Override
-    public void lock() throws InterruptedException {
+    public void lock(){
         myNode.get().state.getAndSet(true);
         QNode pred = tail.getAndSet(myNode.get());
         myPred.set(pred);
