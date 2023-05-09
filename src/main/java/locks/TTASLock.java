@@ -1,12 +1,10 @@
 package locks;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class TTASLock implements MyLock {
 
     AtomicBoolean state = new AtomicBoolean(false);
-    AtomicInteger counter = new AtomicInteger(0);
 
 
     @Override
@@ -14,7 +12,6 @@ public class TTASLock implements MyLock {
         while (true) {
             while (state.get()) {}
             if (!state.getAndSet(true)) {
-                counter.getAndIncrement();
                 return;
             }
         }
@@ -23,10 +20,5 @@ public class TTASLock implements MyLock {
     @Override
     public void unlock() {
         state.set(false);
-    }
-
-    @Override
-    public int getCounter() {
-        return counter.get();
     }
 }

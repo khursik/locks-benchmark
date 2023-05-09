@@ -12,7 +12,6 @@ public class ExponentialBackoff implements MyLock {
     private final static long MAX_DELAY = 3000;
 
     AtomicBoolean state = new AtomicBoolean(false);
-    AtomicInteger counter = new AtomicInteger(0);
 
 
     @Override
@@ -21,7 +20,6 @@ public class ExponentialBackoff implements MyLock {
         while (true) {
             while (state.get()) {}
             if(!state.getAndSet(true)) {
-                counter.getAndIncrement();
                 return;
             }
             sleep((long) (random() * delay));
@@ -34,10 +32,5 @@ public class ExponentialBackoff implements MyLock {
     @Override
     public void unlock() {
         state.set(false);
-    }
-
-    @Override
-    public int getCounter() {
-        return counter.get();
     }
 }
