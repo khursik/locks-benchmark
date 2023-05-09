@@ -4,32 +4,36 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class MCSLock implements MyLock {
 
-    public static class QNode {
-        volatile boolean state = false;
-        volatile QNode next = null;
+    private static class QNode {
+        private volatile boolean state = false;
+        private volatile QNode next = null;
     }
 
-    AtomicReference<QNode> tail = new AtomicReference<>(new QNode());
-    ThreadLocal<QNode> qNode = new ThreadLocal<>();
+    private final AtomicReference<QNode> tail = new AtomicReference<>();
+    private final ThreadLocal<QNode> node = ThreadLocal.withInitial(QNode::new);
 
     @Override
     public void lock() {
-        QNode qPred = tail.getAndSet(qNode.get());
-        if (qPred != null) {
-            qNode.get().state = true;
-            qPred.next = qNode.get();
-            while (qNode.get().state) {}
+        QNode qNode = this.node.get();
+        qNode.state = true;
+        QNode pred = tail.getAndSet(qNode);
+
+        if (pred != null) {
+            pred.next = qNode;
+            while (qNode.state) {}
         }
     }
 
     @Override
     public void unlock() {
-        if (qNode.get().next == null) {
-            if (tail.compareAndSet(qNode.get(), null)) {
+        QNode node = this.node.get();
+        if (node.next == null) {
+            if (tail.compareAndSet(node, null)) {
                 return;
             }
-            while (qNode.get().next == null) {}
+            while (node.next == null) {}
         }
-        qNode.get().next.state = false;
+        node.next.state = false;
+        node.next = null;
     }
 }
