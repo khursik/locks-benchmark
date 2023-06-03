@@ -1,4 +1,4 @@
-package ru.jmh.locks;
+package ru.somepackage.locks;
 
 public interface MyLock {
 
