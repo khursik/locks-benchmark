@@ -1,4 +1,4 @@
-package locks;
+package ru.jmh.locks;
 
 import java.util.concurrent.atomic.AtomicReference;
 

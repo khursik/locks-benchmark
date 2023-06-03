@@ -1,4 +1,4 @@
-package utils;
+package ru.jmh.utils;
 
 public enum LockType {
     TAS,

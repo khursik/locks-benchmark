@@ -1,7 +1,9 @@
-import locks.*;
+package ru.jmh;
+
+import ru.jmh.locks.*;
 import org.apache.commons.cli.ParseException;
-import utils.ArgsParser;
-import utils.LockType;
+import ru.jmh.utils.ArgsParser;
+import ru.jmh.utils.LockType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +11,15 @@ import java.util.concurrent.*;
 
 public class Benchmark {
     private static volatile long counter = 0;
+    private static volatile Boolean stopFlag = false;
 
-    public static void main(String[] args) throws ParseException, InterruptedException, BrokenBarrierException {
+    public static void main(String[] args) throws BrokenBarrierException, ParseException, InterruptedException {
+        runApp(args);
+    }
+
+    public static int runApp(String[] args) throws InterruptedException, BrokenBarrierException, ParseException {
         long startTime = System.currentTimeMillis();
-        System.out.println("Benchmark started in " + startTime);
+        System.out.println("jmh.Benchmark started in " + startTime);
 
         ArgsParser argsParser = new ArgsParser(args);
         int threadsCount = argsParser.getThreadsCount();
@@ -23,6 +30,7 @@ public class Benchmark {
         MyLock lock = getLockImp(LockType.valueOf(lockType));
         final CyclicBarrier gate = new CyclicBarrier(threadsCount + 1);
 
+
         List<Thread> threadsList = new ArrayList<>();
         for (int i = 0; i < threadsCount; i++) {
             threadsList.add(new Thread(() -> {
@@ -32,7 +40,7 @@ public class Benchmark {
                     throw new RuntimeException(e);
                 }
 
-                while(gate.getNumberWaiting() < 1) {
+                while(!stopFlag) {
                     try {
                         lock.lock();
                         counter++;
@@ -53,18 +61,22 @@ public class Benchmark {
 
         try {
             gate.await();
+            startTime = System.currentTimeMillis();
         } catch (InterruptedException | BrokenBarrierException e) {
             throw new RuntimeException(e);
         }
 
         Thread.sleep(timeoutMs);
+        stopFlag = true;
         gate.await();
-
         long completeTime = System.currentTimeMillis();
         System.out.println("Complete incrementation in " + completeTime);
         long totalTime = completeTime - startTime;
         System.out.printf("Total time: %s ms\n", totalTime);
         System.out.println("Counter value: " + counter);
+        counter = 0;
+        stopFlag = false;
+        return 0;
     }
 
     private static MyLock getLockImp(LockType lockType) {

@@ -1,7 +1,7 @@
 plugins {
     java
-    idea
-    id("maven-publish")
+    id("java-library")
+    id("me.champeau.jmh") version "0.7.0"
 }
 
 group = "ru.sbt"
@@ -26,13 +26,25 @@ dependencies {
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("ch.qos.logback:logback-core:$logbackVersion")
+    implementation("org.openjdk.jmh:jmh-archetypes:1.35")
+    implementation("org.openjdk.jmh:jmh-parent:1.35")
+    implementation("org.openjdk.jmh:jmh-core:1.35")
+    implementation("org.openjdk.jmh:jmh-generator-bytecode:1.35")
+    implementation("org.openjdk.jmh:jmh-generator-annprocess:1.35")
+    implementation("org.openjdk.jmh:jmh-generator-asm:1.35")
+    implementation("org.openjdk.jmh:jmh-java-benchmark-archetype:1.35")
 
     implementation("commons-cli:commons-cli:$commonsCliVersion")
-
-    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
-tasks.getByName<Test>("test") {
+tasks.test {
     useJUnitPlatform()
+}
+
+jmh {
+    warmupIterations.set(10)
+    iterations.set(3)
+    fork.set(1)
 }

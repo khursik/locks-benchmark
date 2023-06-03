@@ -1,12 +1,11 @@
-package locks;
+package ru.jmh.locks;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.Math.random;
 import static java.lang.Thread.sleep;
 
-public class ExponentialBackoff implements MyLock {
+public class ExponentialBackoff implements MyLock{
 
     private final static long MIN_DELAY = 100;
     private final static long MAX_DELAY = 3000;

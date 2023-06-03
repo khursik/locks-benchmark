@@ -1,20 +1,15 @@
-package locks;
+package ru.jmh.locks;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class TTASLock implements MyLock {
+public class TASLock implements MyLock{
 
     AtomicBoolean state = new AtomicBoolean(false);
 
 
     @Override
     public void lock() {
-        while (true) {
-            while (state.get()) {}
-            if (!state.getAndSet(true)) {
-                return;
-            }
-        }
+        while (state.getAndSet(true)) {}
     }
 
     @Override
