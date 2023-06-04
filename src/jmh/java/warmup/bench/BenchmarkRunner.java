@@ -4,22 +4,24 @@ import org.apache.commons.cli.ParseException;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.BenchmarkParams;
 import org.openjdk.jmh.infra.Blackhole;
-import ru.somepackage.LockTester;
-import ru.somepackage.utils.BenchArgs;
+import ru.benchmark.Benchmark;
+import ru.benchmark.utils.BenchArgs;
 
 import java.util.concurrent.BrokenBarrierException;
 
 @State(Scope.Benchmark)
-@BenchmarkMode(Mode.AverageTime)
-public class MainBenchmark {
+@BenchmarkMode(Mode.Throughput)
+@Warmup(iterations = 5)
+@Measurement(iterations = 10)
+public class BenchmarkRunner {
 
     @Param("DEADBEEF")
     private String args;
 
-    @Benchmark
+    @org.openjdk.jmh.annotations.Benchmark
     public void main(Blackhole bh, BenchmarkParams p) throws BrokenBarrierException, ParseException, InterruptedException {
         assert args != "DEADBEEF";
-        bh.consume(LockTester.runApp(BenchArgs.of(args).get()));
+        bh.consume(Benchmark.benchmark(BenchArgs.of(args).getArgs()));
     }
 
 }

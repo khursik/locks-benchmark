@@ -1,20 +1,19 @@
-package ru.somepackage.utils;
+package ru.benchmark.utils;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+@Value
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class BenchArgs {
 
     private static final String DELIMITER = "@";
-    private final String[] args;
 
-    protected BenchArgs(String[] args) {
-        this.args = args;
-    }
-
-    public String[] get() {
-        return args;
-    }
+    String[] args;
 
     public static BenchArgs of(String args) {
         return new BenchArgs(args.split(DELIMITER));

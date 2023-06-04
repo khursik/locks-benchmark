@@ -1,44 +1,41 @@
-package ru.somepackage;
+package ru.benchmark;
 
 import org.apache.commons.cli.ParseException;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import ru.somepackage.locks.*;
-import ru.somepackage.utils.ArgsParser;
-import ru.somepackage.utils.BenchArgs;
-import ru.somepackage.utils.LockType;
+import ru.benchmark.locks.*;
+import ru.benchmark.utils.ArgsParser;
+import ru.benchmark.utils.BenchArgs;
+import ru.benchmark.utils.LockType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
-public class LockTester {
+public class Benchmark {
     private static volatile long counter = 0;
     private static volatile Boolean stopFlag = false;
 
-    public static void main(String[] args) throws BrokenBarrierException, ParseException, InterruptedException, RunnerException {
-        warmUpJvm(args);
-        runApp(args);
+    public static void main(String[] args) throws RunnerException {
+        runBenchmark(args);
     }
 
-    public static void warmUpJvm(String[] args) throws RunnerException {
+    /*
+    Run benchmark measurement with warm up
+     */
+    public static void runBenchmark(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include("MainBenchmark")
+                .include("BenchmarkRunner")
                 .param("args", BenchArgs.of(args).toString())
                 .forks(0)
                 .build();
         new Runner(opt).run();
     }
 
-    public static int runApp(String[] args) throws InterruptedException, BrokenBarrierException, ParseException {
-        long startTime = System.currentTimeMillis();
-        System.out.println("jmh.Benchmark started in " + startTime);
-
-        System.err.println(Arrays.stream(args).collect(Collectors.joining("|")));
+    public static int benchmark(String[] args) throws InterruptedException, BrokenBarrierException, ParseException {
+        System.out.println("jmh.Benchmark started in " + System.currentTimeMillis());
 
         ArgsParser argsParser = new ArgsParser(args);
         int threadsCount = argsParser.getThreadsCount();
@@ -80,11 +77,11 @@ public class LockTester {
 
         try {
             gate.await();
-            startTime = System.currentTimeMillis();
         } catch (InterruptedException | BrokenBarrierException e) {
             throw new RuntimeException(e);
         }
 
+        long startTime = System.currentTimeMillis();
         Thread.sleep(timeoutMs);
         stopFlag = true;
         gate.await();

@@ -1,4 +1,4 @@
-package ru.somepackage.utils;
+package ru.benchmark.utils;
 
 public enum LockType {
     TAS,

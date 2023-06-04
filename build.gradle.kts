@@ -7,11 +7,9 @@ plugins {
 sourceSets {
     main {
         java {
-            //include("ru/somepackage/**")
         }
 
         resources {
-
         }
     }
 
@@ -34,15 +32,16 @@ val commonsCliVersion: String by project
 
 
 dependencies {
+    compileOnly("org.projectlombok:lombok:1.18.4")
+    annotationProcessor("org.projectlombok:lombok:1.18.4")
+
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("ch.qos.logback:logback-core:$logbackVersion")
     implementation("org.openjdk.jmh:jmh-archetypes:1.35")
     implementation("org.openjdk.jmh:jmh-parent:1.35")
     implementation("org.openjdk.jmh:jmh-core:1.35")
-    //implementation("org.openjdk.jmh:jmh-generator-bytecode:1.35")
     implementation("org.openjdk.jmh:jmh-generator-annprocess:1.35")
-    //implementation("org.openjdk.jmh:jmh-generator-asm:1.35")
     implementation("org.openjdk.jmh:jmh-java-benchmark-archetype:1.35")
 
     implementation("commons-cli:commons-cli:$commonsCliVersion")
@@ -81,17 +80,17 @@ tasks {
         }
     }
 
-    var mainClass = "ru.somepackage.LockTester"
+    var mainClass = "ru.benchmark.Benchmark"
     jar {
         dependsOn("copyJmhItems")
         manifest.attributes["Main-Class"] = mainClass;
     }
 
     task("fatJar", type = Jar::class) {
-        dependsOn.addAll(listOf("compileJava", "processResources", "copyJmhItems")) // We need this for Gradle optimization to work
+        dependsOn.addAll(listOf("compileJava", "processResources", "copyJmhItems"))
         archiveClassifier.set("standalone")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        manifest { attributes(mapOf("Main-Class" to mainClass)) } // Provided we set it up in the application plugin configuration
+        manifest { attributes(mapOf("Main-Class" to mainClass)) }
         val sourcesMain = sourceSets.main.get()
         val contents =
                 configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) } +

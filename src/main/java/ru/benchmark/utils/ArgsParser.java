@@ -1,4 +1,4 @@
-package ru.somepackage.utils;
+package ru.benchmark.utils;
 
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
