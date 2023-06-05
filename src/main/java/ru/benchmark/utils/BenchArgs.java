@@ -24,6 +24,6 @@ public class BenchArgs {
     }
 
     public String toString() {
-        return Arrays.stream(args).collect(Collectors.joining(DELIMITER));
+        return String.join(DELIMITER, args);
     }
 }

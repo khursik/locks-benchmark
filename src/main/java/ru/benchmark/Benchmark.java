@@ -35,6 +35,10 @@ public class Benchmark {
     }
 
     public static int benchmark(String[] args) throws InterruptedException, BrokenBarrierException, ParseException {
+        // required for jmh warm-up iterations
+        counter = 0;
+        stopFlag = false;
+
         System.out.println("jmh.Benchmark started in " + System.currentTimeMillis());
 
         ArgsParser argsParser = new ArgsParser(args);
@@ -90,8 +94,8 @@ public class Benchmark {
         long totalTime = completeTime - startTime;
         System.out.printf("Total time: %s ms\n", totalTime);
         System.out.println("Counter value: " + counter);
-        counter = 0;
-        stopFlag = false;
+
+        // jmh requires returning constant value for warm-up methods
         return 0;
     }
 
