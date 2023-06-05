@@ -1,4 +1,4 @@
-package locks;
+package ru.benchmark.locks;
 
 public interface MyLock {
 

@@ -1,9 +1,8 @@
-package locks;
-
+package ru.benchmark.locks;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class TASLock implements MyLock {
+public class TASLock implements MyLock{
 
     AtomicBoolean state = new AtomicBoolean(false);
 

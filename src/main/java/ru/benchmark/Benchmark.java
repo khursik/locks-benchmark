@@ -1,7 +1,14 @@
-import locks.*;
+package ru.benchmark;
+
 import org.apache.commons.cli.ParseException;
-import utils.ArgsParser;
-import utils.LockType;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import ru.benchmark.locks.*;
+import ru.benchmark.utils.ArgsParser;
+import ru.benchmark.utils.BenchArgs;
+import ru.benchmark.utils.LockType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +16,30 @@ import java.util.concurrent.*;
 
 public class Benchmark {
     private static volatile long counter = 0;
+    private static volatile Boolean stopFlag = false;
 
-    public static void main(String[] args) throws ParseException, InterruptedException, BrokenBarrierException {
-        long startTime = System.currentTimeMillis();
-        System.out.println("Benchmark started in " + startTime);
+    public static void main(String[] args) throws RunnerException {
+        runBenchmark(args);
+    }
+
+    /*
+    Run benchmark measurement with warm up
+     */
+    public static void runBenchmark(String[] args) throws RunnerException {
+        Options opt = new OptionsBuilder()
+                .include("BenchmarkRunner")
+                .param("args", BenchArgs.of(args).toString())
+                .forks(0)
+                .build();
+        new Runner(opt).run();
+    }
+
+    public static int benchmark(String[] args) throws InterruptedException, BrokenBarrierException, ParseException {
+        // required for jmh warm-up iterations
+        counter = 0;
+        stopFlag = false;
+
+        System.out.println("jmh.Benchmark started in " + System.currentTimeMillis());
 
         ArgsParser argsParser = new ArgsParser(args);
         int threadsCount = argsParser.getThreadsCount();
@@ -23,6 +50,7 @@ public class Benchmark {
         MyLock lock = getLockImp(LockType.valueOf(lockType));
         final CyclicBarrier gate = new CyclicBarrier(threadsCount + 1);
 
+
         List<Thread> threadsList = new ArrayList<>();
         for (int i = 0; i < threadsCount; i++) {
             threadsList.add(new Thread(() -> {
@@ -32,7 +60,7 @@ public class Benchmark {
                     throw new RuntimeException(e);
                 }
 
-                while(gate.getNumberWaiting() < 1) {
+                while(!stopFlag) {
                     try {
                         lock.lock();
                         counter++;
@@ -57,14 +85,18 @@ public class Benchmark {
             throw new RuntimeException(e);
         }
 
+        long startTime = System.currentTimeMillis();
         Thread.sleep(timeoutMs);
+        stopFlag = true;
         gate.await();
-
         long completeTime = System.currentTimeMillis();
         System.out.println("Complete incrementation in " + completeTime);
         long totalTime = completeTime - startTime;
         System.out.printf("Total time: %s ms\n", totalTime);
         System.out.println("Counter value: " + counter);
+
+        // jmh requires returning constant value for warm-up methods
+        return 0;
     }
 
     private static MyLock getLockImp(LockType lockType) {
