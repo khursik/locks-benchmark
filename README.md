@@ -13,7 +13,7 @@ Usage: benchmark [options]
   -t, --type <value> type of lock (TAS, TTAS, Backoff, CLH, MCS)
   -thc, --threadsCount <value>
                            threads count
-  -gt, --timeoutMs <value>
+  -tms, --timeoutMs <value>
                            timeout milliseconds
 
 ```
