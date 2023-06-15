@@ -12,8 +12,8 @@ import java.util.concurrent.BrokenBarrierException;
 
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 5)
-@Measurement(iterations = 10)
+@Warmup(iterations = 6)
+@Measurement(iterations = 6)
 public class BenchmarkRunner {
 
     @Param("DEADBEEF")
